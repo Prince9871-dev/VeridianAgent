@@ -131,6 +131,7 @@ class PolicyEvaluator:
         service_age_years: float,
         hardware_failure_verified: bool = False,
         lead_time_days: Optional[int] = None,
+        is_repair_request: bool = False,
     ) -> DeterministicEvaluationResult:
         """KB-03 and POL-ASSET-01: Laptop Replacement & Lifecycle."""
         kb03 = policy_catalog.get_policy("KB-03")
@@ -164,6 +165,21 @@ class PolicyEvaluator:
         is_eligible_kb03 = (service_age_years >= 3.0) or hardware_failure_verified
 
         if not is_eligible_kb03:
+            if is_repair_request:
+                return DeterministicEvaluationResult(
+                    matched_policy_id="KB-03",
+                    matched_policy_ids=["KB-03", "POL-ASSET-01"],
+                    authoritative_source_text=kb03.exact_source_text if kb03 else None,
+                    authoritative_rule_outcome="INELIGIBLE_FOR_REPLACEMENT_ROUTED_TO_REPAIR_TRIAGE",
+                    authoritative_approvals=[],
+                    authoritative_citations=citations,
+                    source_explicitness=SourceExplicitness.EXPLICIT_POLICY,
+                    precedent_references=precedent_refs,
+                    workflow_action=WorkflowAction.CREATE_TICKET,
+                    operational_status="OPEN",
+                    operational_queue="Hardware Repair / Triage",
+                    user_message="Under Policy KB-03, laptops under 3 years are not eligible for replacement without verified hardware failure. A hardware repair triage ticket has been created for your screen issue.",
+                )
             return DeterministicEvaluationResult(
                 matched_policy_id="KB-03",
                 matched_policy_ids=["KB-03", "POL-ASSET-01"],
@@ -250,7 +266,7 @@ class PolicyEvaluator:
 
     def evaluate_printer_issue(
         self,
-        spooler_restarted: bool,
+        spooler_restarted: bool = False,
         issue_persists: bool = True,
         printer_asset_tag: Optional[str] = None,
     ) -> DeterministicEvaluationResult:
@@ -259,20 +275,7 @@ class PolicyEvaluator:
         precedent = policy_catalog.get_precedent("TK-1046")
         precedent_refs = [f"{precedent.ticket_id} ({precedent.employee}: {precedent.issue_summary} - {precedent.status})"] if precedent else []
 
-        if not spooler_restarted:
-            return DeterministicEvaluationResult(
-                matched_policy_id="KB-05",
-                matched_policy_ids=["KB-05"],
-                authoritative_source_text=policy.exact_source_text if policy else None,
-                authoritative_rule_outcome="INITIAL_PRINTER_TROUBLESHOOTING_STEP",
-                authoritative_approvals=[],
-                authoritative_citations=[policy.source_citation] if policy else [],
-                source_explicitness=SourceExplicitness.EXPLICIT_POLICY,
-                precedent_references=precedent_refs,
-                workflow_action=WorkflowAction.RESOLVE,
-                user_message="Under Policy KB-05, for printer issues, please first check the printer queue and restart the print spooler. If the issue persists, contact us with the printer's asset tag.",
-            )
-        elif issue_persists:
+        if issue_persists:
             if not printer_asset_tag:
                 return DeterministicEvaluationResult(
                     matched_policy_id="KB-05",
@@ -285,7 +288,7 @@ class PolicyEvaluator:
                     precedent_references=precedent_refs,
                     workflow_action=WorkflowAction.ASK_FOLLOW_UP,
                     missing_information=["printer_asset_tag"],
-                    user_message="Under Policy KB-05, if the printer issue persists after restart, please provide the printer’s asset tag so a support ticket can be logged.",
+                    user_message="Under Policy KB-05, for printer issues, please first check the printer queue and restart the print spooler. If the issue persists, please provide the printer’s asset tag so a support ticket can be logged.",
                 )
             else:
                 return DeterministicEvaluationResult(
@@ -302,6 +305,19 @@ class PolicyEvaluator:
                     operational_queue="Desktop Support",
                     user_message=f"Under Policy KB-05, a service ticket has been created for printer asset tag {printer_asset_tag}.",
                 )
+        elif not spooler_restarted:
+            return DeterministicEvaluationResult(
+                matched_policy_id="KB-05",
+                matched_policy_ids=["KB-05"],
+                authoritative_source_text=policy.exact_source_text if policy else None,
+                authoritative_rule_outcome="INITIAL_PRINTER_TROUBLESHOOTING_STEP",
+                authoritative_approvals=[],
+                authoritative_citations=[policy.source_citation] if policy else [],
+                source_explicitness=SourceExplicitness.EXPLICIT_POLICY,
+                precedent_references=precedent_refs,
+                workflow_action=WorkflowAction.RESOLVE,
+                user_message="Under Policy KB-05, for printer issues, please first check the printer queue and restart the print spooler. If the issue persists, contact us with the printer's asset tag.",
+            )
         else:
             return DeterministicEvaluationResult(
                 matched_policy_id="KB-05",

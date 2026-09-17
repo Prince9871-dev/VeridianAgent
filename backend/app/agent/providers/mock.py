@@ -101,6 +101,7 @@ class MockLLMProvider(BaseLLMProvider):
                 candidate_policy_id = "KB-03"
                 facts["asset_type"] = "laptop"
                 facts["hardware_failure_verified"] = False
+                facts["is_repair_request"] = True
                 years_match = re.search(r"(\d+(?:\.\d+)?)\s*years?", lower)
                 facts["service_age_years"] = float(years_match.group(1)) if years_match else 2.0
             else:
@@ -189,9 +190,10 @@ class MockLLMProvider(BaseLLMProvider):
             facts["account_exists"] = "can't log into" in lower or "credentials" in lower or "exists" in lower
 
         # 12. Vague / Incomplete (e.g. REQ-15)
-        elif "not working" in lower and len(lower.split()) < 10:
+        elif ("not working" in lower or "help" in lower) and len(lower.split()) <= 10:
             intent = "UNCLEAR_INQUIRY"
             candidate_policy_id = None
+            facts["is_unclear_inquiry"] = True
 
         # Build and validate through Pydantic schema
         return schema(

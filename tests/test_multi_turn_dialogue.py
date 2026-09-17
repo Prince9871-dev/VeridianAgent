@@ -149,3 +149,58 @@ async def test_session_reset_clears_state(coordinator):
 
     session_store.reset(session_id)
     assert session_store.get(session_id) is None
+
+
+@pytest.mark.asyncio
+async def test_multi_turn_initial_printer_jam_flow(coordinator):
+    """
+    Explicit regression test for the multi-turn printer workflow:
+    Turn 1: User reports printer jamming ('The 3rd-floor printer is jamming and won't print.').
+            Issue persists but asset tag is missing -> ASK_FOLLOW_UP.
+    Turn 2: User provides physical printer asset tag ('The asset tag is PRN-FL3-02.').
+            Coordinator re-evaluates -> CREATE_TICKET in Desktop Support queue.
+    """
+    session_id = "test-session-multi-printer-initial-jam"
+    session_store.reset(session_id)
+
+    # Turn 1: Initial report without asset tag
+    req1 = EmployeeMessage(
+        session_id=session_id,
+        employee_id="EMP-2091",
+        content="The 3rd-floor printer is jamming and won't print.",
+    )
+    res1 = await coordinator.process_message(req1)
+
+    assert res1.action == WorkflowAction.ASK_FOLLOW_UP
+    assert res1.policy_evaluation is not None
+    assert res1.policy_evaluation.policy_id == "KB-05"
+    assert res1.deterministic_evaluation["authoritative_rule_outcome"] == "MISSING_PRINTER_ASSET_TAG"
+    assert "asset tag" in res1.message.lower()
+    assert res1.ticket is None
+
+    session = session_store.get(session_id)
+    assert session is not None
+    assert session.accumulated_facts.get("issue_persists") is True
+    assert session.accumulated_facts.get("printer_asset_tag") is None
+
+    # Turn 2: Providing the requested asset tag
+    req2 = EmployeeMessage(
+        session_id=session_id,
+        employee_id="EMP-2091",
+        content="The asset tag is PRN-FL3-02.",
+    )
+    res2 = await coordinator.process_message(req2)
+
+    assert res2.action == WorkflowAction.CREATE_TICKET
+    assert res2.ticket is not None
+    assert res2.ticket.policy_id == "KB-05"
+    assert res2.deterministic_evaluation["operational_queue"] == "Desktop Support"
+    assert "Desktop Support" in res2.ticket.tags
+    assert "PRN-FL3-02" in res2.ticket.title or "PRN-FL3-02" in res2.ticket.description
+    assert res2.deterministic_evaluation["authoritative_rule_outcome"] == "PRINTER_TICKET_LOGGED_WITH_ASSET_TAG"
+
+    # Confirm session state is durably preserved
+    session = session_store.get(session_id)
+    assert len(session.history) == 4
+    assert session.accumulated_facts.get("printer_asset_tag") == "PRN-FL3-02"
+

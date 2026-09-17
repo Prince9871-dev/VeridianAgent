@@ -102,7 +102,7 @@ def test_kb04_non_catalog_software_requires_security_review():
 
 # --- KB-05: Printer Troubleshooting ---
 def test_kb05_initial_step_spooler_restart():
-    result = policy_evaluator.evaluate_printer_issue(spooler_restarted=False)
+    result = policy_evaluator.evaluate_printer_issue(spooler_restarted=False, issue_persists=False)
     assert result.authoritative_rule_outcome == "INITIAL_PRINTER_TROUBLESHOOTING_STEP"
     assert result.workflow_action == WorkflowAction.RESOLVE
 

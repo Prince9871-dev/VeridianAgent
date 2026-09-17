@@ -35,6 +35,19 @@ class AuditLogger:
             details=details or {},
         )
         self._events.append(event)
+        from backend.app.db.storage import sqlite_store
+        sqlite_store.append_audit_event({
+            "id": event.id,
+            "timestamp": event.timestamp.isoformat(),
+            "session_id": event.session_id,
+            "employee_id": event.employee_id,
+            "actor": event.actor,
+            "event_type": event.event_type.value,
+            "action_taken": event.action_taken,
+            "policy_id": event.policy_id,
+            "policy_citation": event.policy_citation,
+            "details": event.details,
+        })
         return event
 
 

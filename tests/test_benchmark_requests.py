@@ -55,8 +55,8 @@ def test_benchmark_request_deterministic_outcome(bm):
         assert result.matched_policy_id == "KB-02"
 
     elif req_id == "REQ-06":
-        # Meera Iyer: Printer paper jam on 3rd floor (spooler restart first line step)
-        result = policy_evaluator.evaluate_printer_issue(spooler_restarted=False)
+        # Meera Iyer: Printer paper jam on 3rd floor (spooler guidance & missing asset tag follow-up)
+        result = policy_evaluator.evaluate_printer_issue(spooler_restarted=False, issue_persists=True, printer_asset_tag=None)
         assert result.workflow_action == expected_action
         assert result.matched_policy_id == "KB-05"
 

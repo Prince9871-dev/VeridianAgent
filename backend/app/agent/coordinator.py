@@ -365,6 +365,7 @@ class AgentCoordinator:
                 service_age_years=float(facts.get("service_age_years", 0.0)),
                 hardware_failure_verified=facts.get("hardware_failure_verified", False),
                 lead_time_days=facts.get("lead_time_days", 14),
+                is_repair_request=facts.get("is_repair_request", False),
             )
         elif policy_id == "KB-04":
             return policy_evaluator.evaluate_software_request(
@@ -407,7 +408,7 @@ class AgentCoordinator:
                 requested_system=facts.get("requested_system", "server"),
                 business_justification=facts.get("business_justification"),
             )
-        elif len(lower.split()) < 7 and ("help" in lower or "working" in lower):
+        elif facts.get("is_unclear_inquiry") or (len(lower.split()) <= 10 and ("help" in lower or "working" in lower)):
             return handle_unclear_input(raw_text)
         else:
             return handle_no_applicable_policy(raw_text)

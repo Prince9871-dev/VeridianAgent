@@ -4,6 +4,7 @@ from backend.app.api.tickets import router as tickets_router
 from backend.app.api.audit import router as audit_router
 from backend.app.api.policies import router as policies_router
 from backend.app.api.chat import router as chat_router
+from backend.app.api.benchmarks import router as benchmarks_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -12,4 +13,5 @@ api_router.include_router(tickets_router)
 api_router.include_router(audit_router)
 api_router.include_router(policies_router)
 api_router.include_router(chat_router)
+api_router.include_router(benchmarks_router)
 

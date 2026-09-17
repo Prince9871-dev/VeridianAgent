@@ -80,7 +80,7 @@
       "source_page": 1,
       "source_policies": ["KB-05"],
       "expected_authoritative_rule": "First check printer queue and restart print spooler; if issue persists, log ticket with printer's asset tag",
-      "expected_workflow_action": "RESOLVE",
+      "expected_workflow_action": "ASK_FOLLOW_UP",
       "expected_approvals": []
     },
     {
