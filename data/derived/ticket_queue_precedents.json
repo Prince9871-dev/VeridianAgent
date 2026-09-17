@@ -1,0 +1,109 @@
+{
+  "_metadata": {
+    "status": "DERIVED_REPRESENTATION",
+    "notice": "Precedent fixtures derived from Section 3 of data/source/Assignment_2_DataPack.pdf",
+    "source_document": "data/source/Assignment_2_DataPack.pdf"
+  },
+  "precedents": [
+    {
+      "ticket_id": "TK-1042",
+      "employee": "R. Verma",
+      "issue_summary": "VPN credential expired",
+      "status": "Resolved (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Historical resolution pattern for expired VPN credentials under KB-02"
+    },
+    {
+      "ticket_id": "TK-1043",
+      "employee": "S. Iyer",
+      "issue_summary": "Laptop replacement (3.2 yrs old)",
+      "status": "Approved — pending fulfillment (active)",
+      "is_active": true,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating approval for replacement of 3.2 yr old laptop (< 4 yr refresh cycle)"
+    },
+    {
+      "ticket_id": "TK-1044",
+      "employee": "A. Khan",
+      "issue_summary": "Non-catalog software request",
+      "status": "Pending Security review (active)",
+      "is_active": true,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating routing of non-catalog software to IT Security under KB-04"
+    },
+    {
+      "ticket_id": "TK-1045",
+      "employee": "P. Joshi",
+      "issue_summary": "Mailbox quota increase",
+      "status": "Approved at 35GB (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating quota increase approved at 35GB with manager approval under KB-06"
+    },
+    {
+      "ticket_id": "TK-1046",
+      "employee": "M. Das",
+      "issue_summary": "Printer paper jam, floor 2",
+      "status": "Resolved (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating printer resolution under KB-05"
+    },
+    {
+      "ticket_id": "TK-1047",
+      "employee": "K. Singh",
+      "issue_summary": "Home office equipment request",
+      "status": "Pending Finance (active)",
+      "is_active": true,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating WFH equipment pending Finance processing under KB-10"
+    },
+    {
+      "ticket_id": "TK-1048",
+      "employee": "T. Rao",
+      "issue_summary": "Phishing email reported",
+      "status": "Escalated to Security — under investigation (active)",
+      "is_active": true,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating immediate escalation of phishing report under KB-09"
+    },
+    {
+      "ticket_id": "TK-1049",
+      "employee": "V. Nambiar",
+      "issue_summary": "Password reset",
+      "status": "Resolved (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating standard password reset resolution under KB-01"
+    },
+    {
+      "ticket_id": "TK-1050",
+      "employee": "J. Fernandes",
+      "issue_summary": "Admin access request",
+      "status": "Rejected — no business justification provided (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating rejection of admin access request lacking business justification"
+    },
+    {
+      "ticket_id": "TK-1051",
+      "employee": "L. Menon",
+      "issue_summary": "Guest Wi-Fi issued",
+      "status": "Resolved (closed)",
+      "is_active": false,
+      "source_page": 2,
+      "source_section": "Section 3: Ticket Queue",
+      "relevance": "Precedent demonstrating guest Wi-Fi issuance under KB-07 without an ongoing ticket"
+    }
+  ]
+}

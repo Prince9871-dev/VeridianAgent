@@ -1,0 +1,60 @@
+import uuid
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+from backend.app.models.common import AuditEventType
+from backend.app.models.audit import AuditEvent
+
+
+class AuditLogger:
+    """Audit Logging Engine for immutable compliance traceability."""
+
+    def __init__(self):
+        self._events: List[AuditEvent] = []
+
+    def log_event(
+        self,
+        event_type: AuditEventType,
+        actor: str = "SYSTEM",
+        session_id: Optional[str] = None,
+        employee_id: Optional[str] = None,
+        action_taken: Optional[str] = None,
+        policy_id: Optional[str] = None,
+        policy_citation: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ) -> AuditEvent:
+        event = AuditEvent(
+            id=f"AUD-{uuid.uuid4().hex[:12].upper()}",
+            timestamp=datetime.now(timezone.utc),
+            session_id=session_id,
+            employee_id=employee_id,
+            actor=actor,
+            event_type=event_type,
+            action_taken=action_taken,
+            policy_id=policy_id,
+            policy_citation=policy_citation,
+            details=details or {},
+        )
+        self._events.append(event)
+        return event
+
+
+    async def list_events(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+        session_id: Optional[str] = None,
+        employee_id: Optional[str] = None,
+    ) -> List[AuditEvent]:
+        filtered = self._events
+        if session_id:
+            filtered = [e for e in filtered if e.session_id == session_id]
+        if employee_id:
+            filtered = [e for e in filtered if e.employee_id == employee_id]
+        
+        # Newest first
+        sorted_events = sorted(filtered, key=lambda e: e.timestamp, reverse=True)
+        return sorted_events[offset : offset + limit]
+
+
+# Global singleton instance
+audit_logger = AuditLogger()

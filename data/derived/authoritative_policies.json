@@ -1,0 +1,270 @@
+{
+  "_metadata": {
+    "status": "DERIVED_REPRESENTATION",
+    "notice": "This document is a DERIVED representation. The sole authoritative source is data/source/Assignment_2_DataPack.pdf",
+    "source_document": "data/source/Assignment_2_DataPack.pdf",
+    "source_sha256": "21A5ED364EF5063F10B73E349DA3665270C1DB3FE51F85BE91F8E3E347805C50",
+    "derived_at": "2026-09-17T19:13:00Z"
+  },
+  "policies": [
+    {
+      "id": "KB-01",
+      "title": "Password Reset",
+      "category": "Identity & Access",
+      "exact_source_text": "Employees can reset their own password via the self-service portal at any time. If locked out after 5 failed attempts, contact IT to unlock the account manually. No approval required.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-01 - Password Reset, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "self_service_allowed": true,
+        "lockout_threshold": "after 5 failed attempts",
+        "lockout_outcome": "contact IT to unlock account manually",
+        "approvals_required": []
+      },
+      "engineering_workflow": {
+        "unlocked_action": "RESOLVE",
+        "locked_out_action": "CREATE_TICKET",
+        "target_queue": "IT Service Desk",
+        "operational_status": "OPEN"
+      },
+      "required_inputs": ["employee_id", "is_locked_out"]
+    },
+    {
+      "id": "KB-02",
+      "title": "VPN Access",
+      "category": "Network & Remote Access",
+      "exact_source_text": "VPN access is granted automatically to all full-time employees. Contractors require manager approval submitted via the access request form. VPN credentials expire every 90 days and must be renewed by the employee.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-02 - VPN Access, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "full_time_grant": "granted automatically",
+        "contractor_grant": "requires manager approval submitted via the access request form",
+        "credential_validity_days": 90,
+        "renewal_responsibility": "must be renewed by the employee",
+        "approvals_required": ["Manager approval submitted via access request form (contractors only)"]
+      },
+      "engineering_workflow": {
+        "full_time_action": "RESOLVE",
+        "contractor_unapproved_action": "ASK_FOLLOW_UP",
+        "contractor_approved_action": "CREATE_TICKET",
+        "target_queue": "Network Operations",
+        "operational_status": "PENDING_FULFILLMENT"
+      },
+      "required_inputs": ["employee_id", "employment_type"]
+    },
+    {
+      "id": "KB-03",
+      "title": "Laptop Replacement",
+      "category": "Hardware & Lifecycle",
+      "exact_source_text": "Laptops are eligible for replacement after 3 years of service, or earlier in case of verified hardware failure. Requests must be raised at least 2 weeks in advance of intended replacement.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-03 - Laptop Replacement, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "service_eligibility_years": 3.0,
+        "early_replacement_exception": "verified hardware failure",
+        "advance_notice_minimum": "at least 2 weeks in advance",
+        "advance_notice_days": 14,
+        "notice_waiver_for_failure": false,
+        "approvals_required": []
+      },
+      "engineering_workflow": {
+        "eligible_action": "CREATE_TICKET",
+        "ineligible_action": "RESOLVE",
+        "missing_notice_action": "ASK_FOLLOW_UP",
+        "target_queue": "Hardware & Asset Management",
+        "operational_status": "PENDING_APPROVAL"
+      },
+      "required_inputs": ["employee_id", "service_age_years", "hardware_failure_verified", "lead_time_days"]
+    },
+    {
+      "id": "POL-ASSET-01",
+      "title": "Asset Management Policy (Extract)",
+      "category": "Hardware & Lifecycle",
+      "exact_source_text": "All company-issued hardware, including laptops and monitors, follows a standard 4-year refresh cycle from date of issue. Early replacement outside this cycle requires Finance sign-off in addition to IT approval.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: Asset Management Policy (Extract), Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "hardware_scope": "all company-issued hardware, including laptops and monitors",
+        "standard_refresh_cycle_years": 4.0,
+        "early_replacement_threshold": "outside this 4-year cycle",
+        "approvals_required": ["Finance sign-off", "IT approval"]
+      },
+      "engineering_workflow": {
+        "early_replacement_action": "CREATE_TICKET",
+        "standard_refresh_action": "CREATE_TICKET",
+        "target_queue": "Finance & Asset Management",
+        "operational_status": "PENDING_APPROVAL"
+      },
+      "required_inputs": ["asset_type", "hardware_age_years"]
+    },
+    {
+      "id": "KB-04",
+      "title": "Software Installation Requests",
+      "category": "Software Management",
+      "exact_source_text": "Standard software (listed in the approved catalog) can be self-installed. Non-catalog software requires IT Security review, which takes 3–5 business days.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-04 - Software Installation Requests, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "catalog_software_rule": "can be self-installed",
+        "non_catalog_software_rule": "requires IT Security review",
+        "security_review_sla_business_days": "3–5 business days",
+        "approvals_required": ["IT Security review (non-catalog software only)"]
+      },
+      "engineering_workflow": {
+        "catalog_action": "RESOLVE",
+        "non_catalog_action": "CREATE_TICKET",
+        "target_queue": "IT Security",
+        "operational_status": "PENDING_SECURITY_REVIEW"
+      },
+      "required_inputs": ["software_name", "in_approved_catalog"]
+    },
+    {
+      "id": "KB-05",
+      "title": "Printer Troubleshooting",
+      "category": "Peripherals & Printing",
+      "exact_source_text": "For printer issues, first check the printer queue and restart the print spooler. If the issue persists after restart, log a ticket with the printer’s asset tag.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-05 - Printer Troubleshooting, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "initial_troubleshooting_step": "check the printer queue and restart the print spooler",
+        "escalation_condition": "if the issue persists after restart",
+        "mandatory_ticket_data": "printer's asset tag",
+        "approvals_required": []
+      },
+      "engineering_workflow": {
+        "initial_action": "RESOLVE",
+        "ticket_with_asset_tag_action": "CREATE_TICKET",
+        "missing_asset_tag_action": "ASK_FOLLOW_UP",
+        "target_queue": "Desktop Support",
+        "operational_status": "OPEN"
+      },
+      "required_inputs": ["spooler_restarted", "issue_persists", "printer_asset_tag"]
+    },
+    {
+      "id": "KB-06",
+      "title": "Email Mailbox Quota",
+      "category": "Communication & Storage",
+      "exact_source_text": "Default mailbox quota is 25GB. Employees nearing quota should archive old mail. Quota increases beyond 25GB require manager approval and are capped at 50GB.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-06 - Email Mailbox Quota, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "default_quota_gb": 25.0,
+        "nearing_quota_action": "archive old mail",
+        "quota_increase_threshold": "beyond 25GB",
+        "hard_cap_gb": 50.0,
+        "exceeds_cap_rule": "capped at 50GB (cannot be increased beyond 50GB)",
+        "approvals_required": ["Manager approval (for increases beyond 25GB)"]
+      },
+      "engineering_workflow": {
+        "within_default_action": "RESOLVE",
+        "increase_request_action": "CREATE_TICKET",
+        "exceeds_cap_action": "RESOLVE",
+        "target_queue": "IT Operations",
+        "operational_status": "PENDING_MANAGER_APPROVAL"
+      },
+      "required_inputs": ["employee_id", "requested_quota_gb", "manager_approval"]
+    },
+    {
+      "id": "KB-07",
+      "title": "Guest Wi-Fi Access",
+      "category": "Visitor Services",
+      "exact_source_text": "Guest Wi-Fi credentials are valid for 24 hours and can be generated by any employee from the front-desk kiosk. No IT ticket required.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-07 - Guest Wi-Fi Access, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "credential_validity_hours": 24,
+        "generation_method": "can be generated by any employee from the front-desk kiosk",
+        "ticket_mandate": "no IT ticket required",
+        "approvals_required": []
+      },
+      "engineering_workflow": {
+        "standard_action": "RESOLVE",
+        "ticket_created": false
+      },
+      "required_inputs": ["employee_id"]
+    },
+    {
+      "id": "KB-08",
+      "title": "Expense Software Access",
+      "category": "Finance & Business Tools",
+      "exact_source_text": "Access to the expense management tool is granted by Finance, not IT. IT can only assist with login/technical issues once an account already exists.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-08 - Expense Software Access, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "access_granting_authority": "Finance, not IT",
+        "permitted_it_scope": "IT can only assist with login/technical issues once an account already exists",
+        "approvals_required": ["Granted by Finance, not IT"]
+      },
+      "engineering_workflow": {
+        "access_request_action": "RESOLVE",
+        "technical_login_action": "RESOLVE",
+        "missing_info_action": "ASK_FOLLOW_UP"
+      },
+      "required_inputs": ["request_type", "account_exists"]
+    },
+    {
+      "id": "KB-09",
+      "title": "Security Incident Reporting",
+      "category": "Security & Compliance",
+      "exact_source_text": "Any suspected phishing email, malware, or unauthorized access attempt must be reported to security@veridian-corp.example immediately and should not be forwarded to other employees.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-09 - Security Incident Reporting, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "reportable_triggers": ["suspected phishing email", "malware", "unauthorized access attempt"],
+        "reporting_destination": "security@veridian-corp.example immediately",
+        "prohibited_actions": ["should not be forwarded to other employees"],
+        "approvals_required": ["IT Security escalation"]
+      },
+      "engineering_workflow": {
+        "standard_action": "ESCALATE",
+        "target_queue": "Security Operations",
+        "operational_status": "ESCALATED_UNDER_INVESTIGATION"
+      },
+      "required_inputs": ["incident_type", "reported_content", "forwarded_to_others"]
+    },
+    {
+      "id": "KB-10",
+      "title": "Work-From-Home Equipment",
+      "category": "Remote Work & Facilities",
+      "exact_source_text": "Employees working remotely more than 3 days/week are eligible for a one-time home office equipment allowance (chair, monitor). Requires manager sign-off and Finance processing — IT only handles the equipment shipping request once approved.",
+      "source_page": 1,
+      "source_section": "Section 1: Knowledge Base / Policies",
+      "source_citation": "[DataPack: KB-10 - Work-From-Home Equipment, Page 1] § Section 1",
+      "source_explicitness": "EXPLICIT_POLICY",
+      "authoritative_rule": {
+        "eligibility_threshold": "working remotely more than 3 days/week",
+        "threshold_operator": "> 3 days/week",
+        "allowance_scope": "one-time home office equipment allowance (chair, monitor)",
+        "approvals_required": ["Manager sign-off", "Finance processing"],
+        "it_role": "IT only handles the equipment shipping request once approved"
+      },
+      "engineering_workflow": {
+        "ineligible_action": "RESOLVE",
+        "pending_approval_action": "RESOLVE",
+        "approved_action": "CREATE_TICKET",
+        "target_queue": "IT Logistics",
+        "operational_status": "PENDING_SHIPPING"
+      },
+      "required_inputs": ["remote_days_per_week", "equipment_type", "manager_signoff", "finance_processed"]
+    }
+  ]
+}
