@@ -17,6 +17,7 @@ class IntentAnalysis(BaseModel):
     raw_intent: str = Field(..., description="Identified intent label")
     extracted_facts: Dict[str, Any] = Field(default_factory=dict, description="Key parameters extracted from prompt")
     missing_fields: List[str] = Field(default_factory=list, description="Required parameters missing from the request")
+    candidate_policy_id: Optional[str] = Field(None, description="Non-authoritative routing hint suggested by LLM")
     confidence: float = Field(default=1.0, description="Confidence score of classification")
 
 
@@ -38,8 +39,10 @@ class ServiceAgentResponse(BaseModel):
     action: WorkflowAction = Field(..., description="Workflow action determined by the system")
     intent_analysis: Optional[IntentAnalysis] = None
     policy_evaluation: Optional[PolicyEvaluationResult] = None
+    deterministic_evaluation: Optional[Dict[str, Any]] = None
     follow_up_question: Optional[str] = None
     ticket: Optional[Ticket] = None
     source_citation: Optional[str] = Field(None, description="Authoritative source citation displayed to user")
     audit_event_id: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+

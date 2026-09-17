@@ -55,6 +55,10 @@ class AuditLogger:
         sorted_events = sorted(filtered, key=lambda e: e.timestamp, reverse=True)
         return sorted_events[offset : offset + limit]
 
+    def get_events_for_session(self, session_id: str) -> List[AuditEvent]:
+        """Convenience method to retrieve all events for a given session."""
+        return [e for e in self._events if e.session_id == session_id]
+
 
 # Global singleton instance
 audit_logger = AuditLogger()

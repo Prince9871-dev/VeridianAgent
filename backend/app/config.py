@@ -35,7 +35,7 @@ class Settings(BaseSettings):
 
     # LLM Provider Abstraction
     # Supported: "mock", "gemini", "openai"
-    llm_provider: str = Field(default="gemini", alias="LLM_PROVIDER")
+    llm_provider: str = Field(default="mock", alias="LLM_PROVIDER")
     llm_model: str = Field(default="gemini-1.5-flash", alias="LLM_MODEL")
     gemini_api_key: str | None = Field(default=None, alias="GEMINI_API_KEY")
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")

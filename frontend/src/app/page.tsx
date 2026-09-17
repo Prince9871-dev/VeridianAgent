@@ -114,6 +114,8 @@ export default function Home() {
   const [precedents, setPrecedents] = useState<PrecedentItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [sessionId, setSessionId] = useState<string>(() => `session-${Date.now().toString(36)}`);
+
   useEffect(() => {
     // Health check
     fetch("http://localhost:8000/api/v1/health")
@@ -125,7 +127,7 @@ export default function Home() {
           app_name: "Veridian Assist — IT Service Agent",
           app_version: "1.0.0",
           environment: "development",
-          llm_provider: "gemini",
+          llm_provider: "mock",
           datapack_configured: true,
           datapack_path: "data/source/Assignment_2_DataPack.pdf",
         });
@@ -152,11 +154,14 @@ export default function Home() {
     const text = textToSend || inputText;
     if (!text.trim()) return;
 
+    const employeeId = selectedEmployee.split(" ")[0] || "EMP-XXXX";
+    const employeeName = selectedEmployee.split("(")[1]?.replace(")", "") || "Employee";
+
     const userMsg: MessageItem = {
       id: `msg-${Date.now()}`,
       sender: "employee",
-      employeeName: selectedEmployee.split("(")[1]?.replace(")", "") || "Employee",
-      employeeId: selectedEmployee.split(" ")[0] || "EMP-XXXX",
+      employeeName,
+      employeeId,
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
@@ -165,58 +170,35 @@ export default function Home() {
     setInputText("");
     setIsProcessing(true);
 
-    // Call deterministic evaluation API
-    let policyId: string | undefined = undefined;
-    let parameters: Record<string, any> = {};
-
-    const lower = text.toLowerCase();
-    if (lower.includes("laptop") || lower.includes("dead") || lower.includes("3.5")) {
-      policyId = "KB-03";
-      parameters = { service_age_years: 3.5, hardware_failure_verified: true, lead_time_days: 14 };
-    } else if (lower.includes("wi-fi") || lower.includes("wifi") || lower.includes("guest")) {
-      policyId = "KB-07";
-    } else if (lower.includes("locked out") || lower.includes("password")) {
-      policyId = "KB-01";
-      parameters = { is_locked_out: true, failed_attempts: 6 };
-    } else if (lower.includes("vpn") || lower.includes("credential")) {
-      policyId = "KB-02";
-      parameters = { employment_type: "full_time" };
-    } else if (lower.includes("printer") || lower.includes("jam")) {
-      policyId = "KB-05";
-      parameters = { spooler_restarted: false };
-    } else if (lower.includes("wfh") || lower.includes("home") || lower.includes("monitor")) {
-      policyId = "KB-10";
-      parameters = { remote_days_per_week: 4.0, equipment_type: "monitor" };
-    } else if (lower.includes("phishing") || lower.includes("forwarding")) {
-      policyId = "KB-09";
-      parameters = { incident_type: "phishing", forwarded_to_others: true };
-    } else if (lower.includes("quota") || lower.includes("mailbox")) {
-      policyId = "KB-06";
-      parameters = { requested_quota_gb: 25.0 };
-    } else if (lower.includes("admin")) {
-      parameters = { is_admin_access_request: true, requested_system: "finance reporting server" };
-    }
-
-    fetch("http://localhost:8000/api/v1/policies/evaluate", {
+    // Call Phase 3 Coordinator Chat API
+    fetch("http://localhost:8000/api/v1/chat/message", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ policy_id: policyId, raw_query: text, parameters }),
+      body: JSON.stringify({
+        session_id: sessionId,
+        employee_id: employeeId,
+        content: text,
+        metadata: { employee_name: employeeName },
+      }),
     })
       .then((res) => res.json())
       .then((res) => {
-        const evalData = res.data;
-        const agentReply: MessageItem = {
-          id: `msg-${Date.now() + 1}`,
-          sender: "agent",
-          text: evalData.user_message,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          intent: evalData.authoritative_rule_outcome,
-          action: evalData.workflow_action,
-          policyCitation: evalData.authoritative_citations?.join(" & ") || undefined,
-          ticketId: evalData.workflow_action === "CREATE_TICKET" ? `TCK-2026-${Math.floor(1000 + Math.random() * 9000)}` : undefined,
-          auditId: `AUD-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
-        };
-        setMessages((prev) => [...prev, agentReply]);
+        if (res.success && res.data) {
+          const resp = res.data;
+          const agentReply: MessageItem = {
+            id: `msg-${Date.now() + 1}`,
+            sender: "agent",
+            text: resp.message,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            intent: resp.intent_analysis?.raw_intent || resp.deterministic_evaluation?.authoritative_rule_outcome,
+            extractedFacts: resp.intent_analysis?.extracted_facts || {},
+            action: resp.action,
+            policyCitation: resp.source_citation || undefined,
+            ticketId: resp.ticket?.id || undefined,
+            auditId: resp.audit_event_id || `AUD-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+          };
+          setMessages((prev) => [...prev, agentReply]);
+        }
         setIsProcessing(false);
       })
       .catch(() => {
@@ -249,7 +231,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-white">VERIDIAN ASSIST</h1>
               <span className="rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-semibold text-indigo-400">
-                Phase 2 Knowledge Layer
+                Phase 3 Agentic Coordinator
               </span>
             </div>
             <p className="text-xs text-slate-400">
